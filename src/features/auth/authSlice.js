@@ -1,9 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../app/axios';
+import { setAccessToken, setRefreshToken, clearTokens } from '../../app/tokenStore';
 
 export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
   try {
     const { data } = await api.post('/auth/login', credentials);
+    setAccessToken(data.accessToken);
+    setRefreshToken(data.refreshToken);
     return data;
   } catch (e) {
     return rejectWithValue(e.response?.data?.message || 'Login failed');
@@ -20,7 +23,11 @@ export const fetchMe = createAsyncThunk('auth/me', async (_, { rejectWithValue }
 });
 
 export const logout = createAsyncThunk('auth/logout', async () => {
-  await api.post('/auth/logout');
+  try {
+    const refreshToken = localStorage.getItem('psa_refresh_token');
+    if (refreshToken) await api.post('/auth/logout', { refreshToken });
+  } catch (_) {}
+  clearTokens();
 });
 
 const slice = createSlice({
