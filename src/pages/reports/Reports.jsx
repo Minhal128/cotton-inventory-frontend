@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { FileDown, Download, FileText, FileSpreadsheet } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { FileDown, Download, FileBarChart2, Sparkles } from 'lucide-react';
 import api from '../../app/axios';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card, CardBody, CardHeader } from '../../components/ui/Card';
@@ -11,13 +12,13 @@ import { formatDate, formatNumber, formatCurrency, toInputDate } from '../../lib
 import toast from 'react-hot-toast';
 
 const REPORTS = [
-  { key: 'cotton-arrival', label: 'Cotton Arrival Report', icon: FileText },
-  { key: 'cotton-stock', label: 'Cotton Stock Report', icon: FileText },
-  { key: 'cotton-issue', label: 'Cotton Issue Report', icon: FileText },
-  { key: 'production', label: 'Production Report', icon: FileText },
-  { key: 'yarn-inventory', label: 'Yarn Inventory Report', icon: FileText },
-  { key: 'dispatch', label: 'Dispatch Report', icon: FileText },
-  { key: 'customer-dispatch', label: 'Customer Dispatch Report', icon: FileText },
+  { key: 'cotton-arrival', label: 'Cotton Arrival' },
+  { key: 'cotton-stock', label: 'Cotton Stock' },
+  { key: 'cotton-issue', label: 'Cotton Issue' },
+  { key: 'production', label: 'Production' },
+  { key: 'yarn-inventory', label: 'Yarn Inventory' },
+  { key: 'dispatch', label: 'Dispatch' },
+  { key: 'customer-dispatch', label: 'Customer Dispatch' },
 ];
 
 export default function Reports() {
@@ -46,7 +47,7 @@ export default function Reports() {
     switch (key) {
       case 'cotton-arrival':
         return [
-          { key: 'arrivalCode', label: 'Code', render: (r) => r.arrivalCode },
+          { key: 'arrivalCode', label: 'Code' },
           { key: 'batchNumber', label: 'Batch' },
           { key: 'supplierName', label: 'Supplier' },
           { key: 'arrivalDate', label: 'Date', render: (r) => formatDate(r.arrivalDate) },
@@ -124,54 +125,82 @@ export default function Reports() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Reports" subtitle="Generate detailed reports across all modules" />
+      <PageHeader
+        icon={FileBarChart2}
+        title="Reports"
+        subtitle="Generate detailed reports across all modules"
+        action={
+          <div className="hidden sm:flex items-center gap-2 text-xs text-ink-2">
+            <Sparkles size={14} className="text-primary" />
+            Export to Excel or PDF in one click
+          </div>
+        }
+      />
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+      <motion.div
+        className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2"
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.04 } } }}
+      >
         {REPORTS.map((r) => (
-          <button
+          <motion.button
             key={r.key}
+            variants={{ hidden: { opacity: 0, y: 6 }, show: { opacity: 1, y: 0 } }}
             onClick={() => { setActive(r.key); setFrom(''); setTo(''); }}
-            className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${active === r.key ? 'bg-primary-soft text-primary border-primary/20' : 'bg-surface border-border text-ink-2 hover:bg-surface-2'}`}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
+              active === r.key
+                ? 'bg-gradient-to-br from-primary to-[#5B2EE6] text-white border-transparent shadow-md shadow-primary/20'
+                : 'bg-surface border-border text-ink-2 hover:bg-surface-2'
+            }`}
           >
             {r.label}
-          </button>
+          </motion.button>
         ))}
-      </div>
+      </motion.div>
 
-      <Card>
-        <CardBody className="flex flex-wrap items-end gap-3">
-          <FormField label="From"><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></FormField>
-          <FormField label="To"><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></FormField>
-          <Button onClick={() => load(1)}>Generate</Button>
-          <div className="ml-auto flex items-center gap-2">
-            <Button variant="secondary" onClick={() => exportCSV(`${active}-report.csv`, flat)}><Download size={16} /> Excel</Button>
-            <Button variant="secondary" onClick={() => exportPDF(`${active}-report`, cols, data.items || [])}><FileDown size={16} /> PDF</Button>
-          </div>
-        </CardBody>
-      </Card>
-
-      {data.totals && (
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <Card>
-          <CardHeader title="Totals" />
-          <CardBody>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-              {Object.entries(data.totals).map(([k, v]) => (
-                <div key={k}>
-                  <p className="text-xs text-ink-2 capitalize">{k.replace(/([A-Z])/g, ' $1')}</p>
-                  <p className="text-base font-semibold text-ink mt-1">{typeof v === 'number' ? formatNumber(v) : String(v)}</p>
-                </div>
-              ))}
+          <CardBody className="flex flex-wrap items-end gap-3">
+            <FormField label="From"><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></FormField>
+            <FormField label="To"><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></FormField>
+            <Button onClick={() => load(1)}>Generate</Button>
+            <div className="ml-auto flex items-center gap-2">
+              <Button variant="secondary" onClick={() => exportCSV(`${active}-report.csv`, flat)}><Download size={16} /> Excel</Button>
+              <Button variant="secondary" onClick={() => exportPDF(`${active}-report`, cols, data.items || [])}><FileDown size={16} /> PDF</Button>
             </div>
           </CardBody>
         </Card>
+      </motion.div>
+
+      {data.totals && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+          <Card>
+            <CardHeader title="Totals" />
+            <CardBody>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                {Object.entries(data.totals).map(([k, v]) => (
+                  <div key={k} className="rounded-lg bg-surface-2/60 p-3">
+                    <p className="text-xs text-ink-2 capitalize">{k.replace(/([A-Z])/g, ' $1')}</p>
+                    <p className="text-base font-semibold text-ink mt-1">{typeof v === 'number' ? formatNumber(v) : String(v)}</p>
+                  </div>
+                ))}
+              </div>
+            </CardBody>
+          </Card>
+        </motion.div>
       )}
 
-      <Card>
-        <CardBody className="p-0">
-          <Table columns={cols} data={data.items || []} loading={loading} />
-          <Pagination page={page} pages={pages} total={data.count || (data.items || []).length} onPageChange={load} />
-        </CardBody>
-      </Card>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <Card>
+          <CardBody className="p-0">
+            <Table columns={cols} data={data.items || []} loading={loading} />
+            <Pagination page={page} pages={pages} total={data.count || (data.items || []).length} onPageChange={load} />
+          </CardBody>
+        </Card>
+      </motion.div>
     </div>
   );
 }

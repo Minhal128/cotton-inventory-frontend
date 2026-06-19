@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Plus, KeyRound, Power, Trash2, Pencil, Users as UsersIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useDataTable } from '../../hooks/useDataTable';
@@ -16,7 +17,7 @@ import { formatDateTime } from '../../lib/format';
 export default function Users() {
   const t = useDataTable('/users');
   const [modal, setModal] = useState({ open: false, user: null });
-  const [pwModal, setPwModal] = useState({ open: false, user: null });
+  const [pwModal, setPwModal] = useState({ open: false, user: null, password: '' });
   const [form, setForm] = useState({ username: '', password: '', fullName: '', email: '', role: ROLES.COTTON_ARRIVAL });
 
   function openCreate() {
@@ -62,7 +63,7 @@ export default function Users() {
     try {
       await api.post(`/users/${pwModal.user._id}/reset-password`, { newPassword: pwModal.password });
       toast.success('Password reset. User must change on next login.');
-      setPwModal({ open: false, user: null });
+      setPwModal({ open: false, user: null, password: '' });
     } catch (e) { toast.error(e.response?.data?.message || 'Failed'); }
   }
 
@@ -76,10 +77,10 @@ export default function Users() {
     {
       key: 'actions', label: '', render: (r) => (
         <div className="flex items-center justify-end gap-1">
-          <button onClick={() => openEdit(r)} className="h-8 w-8 rounded-md hover:bg-surface-2 text-ink-2 hover:text-ink flex items-center justify-center"><Pencil size={15} /></button>
-          <button onClick={() => setPwModal({ open: true, user: r, password: '' })} className="h-8 w-8 rounded-md hover:bg-surface-2 text-ink-2 hover:text-ink flex items-center justify-center"><KeyRound size={15} /></button>
-          <button onClick={() => toggleActive(r)} className="h-8 w-8 rounded-md hover:bg-surface-2 text-ink-2 hover:text-ink flex items-center justify-center"><Power size={15} /></button>
-          <button onClick={() => remove(r)} className="h-8 w-8 rounded-md hover:bg-danger-soft text-danger flex items-center justify-center"><Trash2 size={15} /></button>
+          <button onClick={() => openEdit(r)} title="Edit" className="h-8 w-8 rounded-md hover:bg-surface-2 text-ink-2 hover:text-ink flex items-center justify-center transition"><Pencil size={15} /></button>
+          <button onClick={() => setPwModal({ open: true, user: r, password: '' })} title="Reset password" className="h-8 w-8 rounded-md hover:bg-surface-2 text-ink-2 hover:text-ink flex items-center justify-center transition"><KeyRound size={15} /></button>
+          <button onClick={() => toggleActive(r)} title={r.isActive ? 'Deactivate' : 'Activate'} className="h-8 w-8 rounded-md hover:bg-surface-2 text-ink-2 hover:text-ink flex items-center justify-center transition"><Power size={15} /></button>
+          <button onClick={() => remove(r)} title="Delete" className="h-8 w-8 rounded-md hover:bg-danger-soft text-danger flex items-center justify-center transition"><Trash2 size={15} /></button>
         </div>
       ),
     },
@@ -88,16 +89,19 @@ export default function Users() {
   return (
     <div className="space-y-6">
       <PageHeader
+        icon={UsersIcon}
         title="User Management"
         subtitle="Create, edit and manage system users"
         action={<Button onClick={openCreate}><Plus size={16} /> New User</Button>}
       />
-      <Card>
-        <CardBody className="p-0">
-          <Table columns={columns} data={t.data} loading={t.loading} empty="No users yet" />
-          <Pagination page={t.page} pages={t.pages} total={t.total} onPageChange={t.setPage} />
-        </CardBody>
-      </Card>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+        <Card>
+          <CardBody className="p-0">
+            <Table columns={columns} data={t.data} loading={t.loading} empty="No users yet" />
+            <Pagination page={t.page} pages={t.pages} total={t.total} onPageChange={t.setPage} />
+          </CardBody>
+        </Card>
+      </motion.div>
 
       <Modal
         open={modal.open}
@@ -137,17 +141,17 @@ export default function Users() {
 
       <Modal
         open={pwModal.open}
-        onClose={() => setPwModal({ open: false, user: null })}
+        onClose={() => setPwModal({ open: false, user: null, password: '' })}
         title={`Reset Password — ${pwModal.user?.username}`}
         footer={
           <>
-            <Button variant="secondary" onClick={() => setPwModal({ open: false, user: null })}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setPwModal({ open: false, user: null, password: '' })}>Cancel</Button>
             <Button onClick={resetPassword}>Reset</Button>
           </>
         }
       >
         <FormField label="New Password" required>
-          <Input type="password" value={pwModal.password || ''} onChange={(e) => setPwModal({ ...pwModal, password: e.target.value })} placeholder="Min 10 chars, upper/lower/digit/special" />
+          <Input type="password" value={pwModal.password} onChange={(e) => setPwModal({ ...pwModal, password: e.target.value })} placeholder="Min 10 chars, upper/lower/digit/special" />
         </FormField>
       </Modal>
     </div>

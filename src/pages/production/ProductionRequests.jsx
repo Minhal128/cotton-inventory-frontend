@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Check, X, Search, Download, FileDown } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Plus, Check, X, Search, Download, FileDown, ClipboardList } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { useDataTable } from '../../hooks/useDataTable';
@@ -57,8 +58,8 @@ export default function ProductionRequests() {
       key: 'actions', label: '', render: (r) => (
         canApprove && r.status === 'PENDING' ? (
           <div className="flex items-center justify-end gap-1">
-            <button onClick={() => setStatus(r._id, 'APPROVED')} className="h-8 px-3 rounded-md bg-success-soft text-success text-xs font-medium">Approve</button>
-            <button onClick={() => setStatus(r._id, 'REJECTED')} className="h-8 px-3 rounded-md bg-danger-soft text-danger text-xs font-medium">Reject</button>
+            <button onClick={() => setStatus(r._id, 'APPROVED')} className="h-8 px-3 rounded-md bg-success-soft text-success text-xs font-medium inline-flex items-center gap-1 transition hover:bg-success hover:text-white"><Check size={12} /> Approve</button>
+            <button onClick={() => setStatus(r._id, 'REJECTED')} className="h-8 px-3 rounded-md bg-danger-soft text-danger text-xs font-medium inline-flex items-center gap-1 transition hover:bg-danger hover:text-white"><X size={12} /> Reject</button>
           </div>
         ) : <span />
       ),
@@ -73,6 +74,7 @@ export default function ProductionRequests() {
   return (
     <div className="space-y-6">
       <PageHeader
+        icon={ClipboardList}
         title="Production Requests"
         subtitle="Submit and track cotton requests for production"
         action={
@@ -83,20 +85,24 @@ export default function ProductionRequests() {
           </div>
         }
       />
-      <Card>
-        <CardBody className="space-y-3">
-          <div className="relative max-w-md">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
-            <Input placeholder="Search…" className="pl-9" value={t.search} onChange={(e) => t.setSearch(e.target.value)} />
-          </div>
-        </CardBody>
-      </Card>
-      <Card>
-        <CardBody className="p-0">
-          <Table columns={columns} data={t.data} loading={t.loading} empty="No requests" />
-          <Pagination page={t.page} pages={t.pages} total={t.total} onPageChange={t.setPage} />
-        </CardBody>
-      </Card>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+        <Card>
+          <CardBody>
+            <div className="relative max-w-md">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
+              <Input placeholder="Search by code, status, requester…" className="pl-9" value={t.search} onChange={(e) => t.setSearch(e.target.value)} />
+            </div>
+          </CardBody>
+        </Card>
+      </motion.div>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
+        <Card>
+          <CardBody className="p-0">
+            <Table columns={columns} data={t.data} loading={t.loading} empty="No requests" />
+            <Pagination page={t.page} pages={t.pages} total={t.total} onPageChange={t.setPage} />
+          </CardBody>
+        </Card>
+      </motion.div>
 
       <Modal
         open={modal.open}

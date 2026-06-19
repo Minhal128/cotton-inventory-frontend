@@ -1,9 +1,10 @@
+import { motion } from 'framer-motion';
+import { Search, Download, FileDown, Boxes } from 'lucide-react';
 import { useDataTable } from '../../hooks/useDataTable';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card, CardBody } from '../../components/ui/Card';
 import { Table, Pagination } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
-import { Search, Download, FileDown } from 'lucide-react';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { formatNumber, formatCurrency, formatDate } from '../../lib/format';
@@ -36,6 +37,7 @@ export default function CottonInventory() {
   return (
     <div className="space-y-6">
       <PageHeader
+        icon={Boxes}
         title="Cotton Inventory"
         subtitle="Real-time stock of every cotton batch"
         action={
@@ -45,20 +47,24 @@ export default function CottonInventory() {
           </div>
         }
       />
-      <Card>
-        <CardBody className="space-y-3">
-          <div className="relative max-w-md">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
-            <Input placeholder="Search…" className="pl-9" value={t.search} onChange={(e) => t.setSearch(e.target.value)} />
-          </div>
-        </CardBody>
-      </Card>
-      <Card>
-        <CardBody className="p-0">
-          <Table columns={columns} data={t.data} loading={t.loading} />
-          <Pagination page={t.page} pages={t.pages} total={t.total} onPageChange={t.setPage} />
-        </CardBody>
-      </Card>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+        <Card>
+          <CardBody>
+            <div className="relative max-w-md">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
+              <Input placeholder="Search by batch, type, supplier…" className="pl-9" value={t.search} onChange={(e) => t.setSearch(e.target.value)} />
+            </div>
+          </CardBody>
+        </Card>
+      </motion.div>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
+        <Card>
+          <CardBody className="p-0">
+            <Table columns={columns} data={t.data} loading={t.loading} />
+            <Pagination page={t.page} pages={t.pages} total={t.total} onPageChange={t.setPage} />
+          </CardBody>
+        </Card>
+      </motion.div>
     </div>
   );
 }

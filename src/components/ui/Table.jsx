@@ -1,5 +1,6 @@
-import { cn } from '../../app/cn';
+import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '../../app/cn';
 
 export function Table({ columns, data, loading, empty = 'No data' }) {
   return (
@@ -17,7 +18,9 @@ export function Table({ columns, data, loading, empty = 'No data' }) {
         <tbody>
           {loading && (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-10 text-center text-ink-2">Loading…</td>
+              <td colSpan={columns.length} className="px-4 py-10 text-center text-ink-2">
+                <div className="inline-block h-5 w-5 rounded-full border-2 border-border border-t-primary animate-spin" />
+              </td>
             </tr>
           )}
           {!loading && data?.length === 0 && (
@@ -26,13 +29,19 @@ export function Table({ columns, data, loading, empty = 'No data' }) {
             </tr>
           )}
           {!loading && data?.map((row, i) => (
-            <tr key={row._id || i} className="border-t border-border hover:bg-row-hover transition">
+            <motion.tr
+              key={row._id || i}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25, delay: Math.min(i * 0.025, 0.4) }}
+              className="border-t border-border hover:bg-row-hover transition"
+            >
               {columns.map((c) => (
                 <td key={c.key} className={cn('px-4 py-3 text-ink align-middle', c.cellClassName)}>
                   {c.render ? c.render(row) : row[c.key]}
                 </td>
               ))}
-            </tr>
+            </motion.tr>
           ))}
         </tbody>
       </table>
@@ -51,14 +60,14 @@ export function Pagination({ page, pages, total, onPageChange }) {
         <button
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
-          className="h-8 w-8 rounded-md border border-border bg-surface text-ink hover:bg-surface-2 disabled:opacity-50 flex items-center justify-center"
+          className="h-8 w-8 rounded-md border border-border bg-surface text-ink hover:bg-surface-2 disabled:opacity-50 flex items-center justify-center transition"
         >
           <ChevronLeft size={16} />
         </button>
         <button
           disabled={page >= pages}
           onClick={() => onPageChange(page + 1)}
-          className="h-8 w-8 rounded-md border border-border bg-surface text-ink hover:bg-surface-2 disabled:opacity-50 flex items-center justify-center"
+          className="h-8 w-8 rounded-md border border-border bg-surface text-ink hover:bg-surface-2 disabled:opacity-50 flex items-center justify-center transition"
         >
           <ChevronRight size={16} />
         </button>

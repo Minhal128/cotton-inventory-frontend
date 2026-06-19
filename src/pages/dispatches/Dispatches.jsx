@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Search, Download, FileDown } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Plus, Search, Download, FileDown, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { useDataTable } from '../../hooks/useDataTable';
@@ -60,6 +61,7 @@ export default function Dispatches() {
   return (
     <div className="space-y-6">
       <PageHeader
+        icon={Send}
         title="Customer Dispatches"
         subtitle="Dispatch yarn to customers and track deliveries"
         action={
@@ -70,20 +72,24 @@ export default function Dispatches() {
           </div>
         }
       />
-      <Card>
-        <CardBody className="space-y-3">
-          <div className="relative max-w-md">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
-            <Input placeholder="Search…" className="pl-9" value={t.search} onChange={(e) => t.setSearch(e.target.value)} />
-          </div>
-        </CardBody>
-      </Card>
-      <Card>
-        <CardBody className="p-0">
-          <Table columns={columns} data={t.data} loading={t.loading} empty="No dispatches yet" />
-          <Pagination page={t.page} pages={t.pages} total={t.total} onPageChange={t.setPage} />
-        </CardBody>
-      </Card>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+        <Card>
+          <CardBody>
+            <div className="relative max-w-md">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
+              <Input placeholder="Search by code, customer, vehicle…" className="pl-9" value={t.search} onChange={(e) => t.setSearch(e.target.value)} />
+            </div>
+          </CardBody>
+        </Card>
+      </motion.div>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
+        <Card>
+          <CardBody className="p-0">
+            <Table columns={columns} data={t.data} loading={t.loading} empty="No dispatches yet" />
+            <Pagination page={t.page} pages={t.pages} total={t.total} onPageChange={t.setPage} />
+          </CardBody>
+        </Card>
+      </motion.div>
 
       <Modal
         open={modal.open}
