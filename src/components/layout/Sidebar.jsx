@@ -17,7 +17,6 @@ function navItemFor(user) {
     { to: '/', label: 'Dashboard', icon: LayoutDashboard, roles: Object.values(ROLES) },
     { to: '/cotton-arrivals', label: 'Cotton Arrivals', icon: Truck, roles: [ROLES.SUPER_ADMIN, ROLES.COTTON_ARRIVAL, ROLES.COTTON_ISSUE] },
     { to: '/cotton-inventory', label: 'Cotton Inventory', icon: Boxes, roles: [ROLES.SUPER_ADMIN, ROLES.COTTON_ARRIVAL, ROLES.COTTON_ISSUE] },
-    { to: '/cotton-issues', label: 'Cotton Issues', icon: Package, roles: [ROLES.SUPER_ADMIN, ROLES.COTTON_ISSUE, ROLES.PRODUCTION] },
     { to: '/production-requests', label: 'Production Requests', icon: Scissors, roles: [ROLES.SUPER_ADMIN, ROLES.PRODUCTION, ROLES.COTTON_ISSUE] },
     { to: '/productions', label: 'Productions', icon: Scissors, roles: [ROLES.SUPER_ADMIN, ROLES.PRODUCTION, ROLES.DISPATCH] },
     { to: '/yarn-inventory', label: 'Yarn Inventory', icon: Boxes, roles: [ROLES.SUPER_ADMIN, ROLES.PRODUCTION, ROLES.DISPATCH] },
